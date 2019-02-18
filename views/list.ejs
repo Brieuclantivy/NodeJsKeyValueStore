@@ -1,0 +1,77 @@
+<%- include includes/header %>
+    <div class="table-wrapper">
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <input type="text" class="form-control" name="key" id="addkey" placeholder="key" required>
+            </div>
+            <div class="form-group col-md-4">
+                <input type="text" class="form-control" name="value" id="addvalue" placeholder="value" required>
+            </div>
+        </div>
+        <a rel="noopener" class="btn btn-sm btn-success" onclick="AddKey();">Add a Key</a>
+
+        <!--<button onclick="EditMode()">Edit Mode</button>-->
+        <div id="key" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+            <% store.forEach((st, index) => { %>
+                    <label>Key:</label>
+                    <input type="text" class="form-control" name="key" id="<%= st.id %>" value="<%= st.key_name %>">
+                    <label>Value:</label>
+                    <input type="text" class="form-control" name="key" id="<%= st.id %>K" value="<%= st.value_name %>">
+                        <button class="btn btn-primary btn-sm" onclick="Edit(<%= st.id %>)">Edit</button>
+                        <button class="btn btn-danger" onclick="del(<%= st.id %>)">Delete</button>
+                        <br>
+                        <% }) %>
+        </div>
+    </div>
+    <script>
+        function del(id) {
+            console.log("ID ------> : " + id);
+            var jqxhr = $.get( "/api/" + id, function() {
+                //alert( "success" );
+            })
+            .fail(function() {
+                alert( "error" );
+            })
+            $("#key").load(location.href + " #key > *");            
+        }
+
+        function Edit(id) {
+            key_name = document.getElementById(id).value;
+            value_name = document.getElementById(id + "K").value;
+            console.log("Id : " + id + " key : " + key_name + "  value : " + value_name);
+
+            $.ajax({
+                method: "POST",
+                url: "/edit/" + id,
+                data: {key: key_name, value: value_name}
+            }).done(function( msg ) {
+                console.log( "Data Saved: " + msg );
+            });
+            $("#key").load(location.href + " #key > *");
+        }
+
+        function AddKey() {
+            console.log("COUCOU");
+            key_name = document.getElementById("addkey").value;
+            value_name = document.getElementById("addvalue").value;
+
+            if (key_name && value_name) {
+                $.ajax({
+                    method: "POST",
+                    url: "/add/",
+                    data: {key: key_name, value: value_name}
+                }).done(function( msg ) {
+                    console.log( "Data Saved: " + msg );
+                });
+                $("#key").load(location.href + " #key > *");
+                $("#form-row").load(location.href + " #form-row > *");
+                document.getElementById("addkey").value = '';
+                value_name = document.getElementById("addvalue").value = '';
+            }
+        }
+
+        function EditMode() {
+
+        }
+        </script>
+<%- include includes/footer %>
